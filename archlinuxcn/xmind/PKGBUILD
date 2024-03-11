@@ -19,13 +19,27 @@ depends=(gtk3 alsa-lib libxkbfile nss)
 install=xmind.install
 options=(!strip)
 source_x86_64=("https://dl2.xmind.cn/Xmind-for-Linux-amd64bit-${_pkgver}-uos.deb"
-  "xmind.sh")
+  "xmind.sh"
+  "xmind.desktop")
 sha256sums_x86_64=('1adc46ffa6c66d735d1b3b7882ab25dbc31693beeb566f69ad59035711e3b09a'
-  '42d6e0aca872f01b9d15e65762220a43c0c266cc6cc8a9238e9c4dc3a9959b04')
+  '67ae232f9cae8024db7bda718ac65d82a9a1c1c44ff01a3cb896ef7eed14ea32'
+  '26e0a8e4c7e7bd7f9c46e52f5a80de808566d9619a3df1a83fb4dda916172bae')
 
 package() {
-  bsdtar -xf ${srcdir}/data.tar.xz -C ${pkgdir}/
-  install -d "$pkgdir/usr/bin"
+  bsdtar -xf ${srcdir}/data.tar.xz -C "$srcdir"/
 
+  # bin
   install -Dm755 "$pkgname".sh "$pkgdir"/usr/bin/xmind
+  # desktop
+  install -Dm644 "$pkgname".desktop -t "$pkgdir"/usr/share/applications
+
+  cd "$srcdir"/opt/apps/net.xmind.vana/
+  # icon
+  install -Dm644 entries/icons/hicolor/64x64/apps/xmind.png "$pkgdir"/usr/share/pixmaps/xmind.png
+  # resources
+  cd files/
+  rm bin/ -rf
+  install -dm0755 "$pkgdir"/usr/lib/xmind
+  find . -type d -exec install -d {,"$pkgdir"/usr/lib/xmind/}{} \;
+  find . -type f -exec install -D {,"$pkgdir"/usr/lib/xmind/}{} \;
 }
